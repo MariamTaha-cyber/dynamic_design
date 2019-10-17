@@ -22,11 +22,11 @@ int main(void)
 	UART_init();
 	LCD_init();
 
-	DDRC &=~(1<<PC0);
-	PORTC |=(1<<PC0);
-	DDRC &=~(1<<PC1);
-	PORTC |=(1<<PC1);
+	switch_init(PORTB,PB2);
+	switch_init(PORTC,PC4);
 
+	DDRB |= (1u << PB4);
+	PORTB &= ~(1u << PB4);
 	LCD_clearScreen();
 	LCD_displayString("Distance= ");
 	LCD_goToRowColumn(0,15);
@@ -39,21 +39,22 @@ int main(void)
 	{
 		speed = UART_recieveByte();
 
-		if(!(PINC & (1<<PC0)))
+		if(!(switch_status(PORTC, PC4)))
 		{
 			_delay_ms(30);
-			if(!(PINC & (1<<PC0)))
+			if(!(switch_status(PORTC, PC4)))
 			{
 				start_flag=1;
 			}
 		}
 
 
-		if(!(PINC & (1<<PC1)))
+		if(!(switch_status(PORTB, PB2)))
 		{
 			_delay_ms(30);
-			if(!(PINC & (1<<PC1)))
+			if(!(switch_status(PORTB, PB2)))
 			{
+				distance = 0;
 				start_flag=0;
 			}
 		}
@@ -61,7 +62,7 @@ int main(void)
 
 		if(start_flag==1)
 		{
-			distance = (speed*g_tick);
+			distance += (speed);
 			LCD_goToRowColumn(0,9);
 			LCD_intgerToString(distance);
 		}
