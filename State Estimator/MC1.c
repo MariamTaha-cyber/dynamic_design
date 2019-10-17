@@ -9,8 +9,11 @@
 #include "keypad.h"
 #include "TIMER.h"
 #include "uart.h"
+#include "switch.h"
 
 #define startTimer 0x01
+
+void displayTime();
 
 int main(void)
 {
@@ -18,8 +21,8 @@ int main(void)
 	uint8 flagInc = 0;
 	uint8 flagDec = 0;
 
-	DDRB &= ~((1u << PB0) | (1u << PB1));
-	PORTB |= ((1u << PB0) | (1u << PB1));
+	switch_init(PORTB,PB2);
+	switch_init(PORTC,PC4);
 
 	UART_init();
 	LCD_init();
@@ -38,11 +41,16 @@ int main(void)
 
 	while(1)
 	{
-		UART_sendByte(speed);
-		if(!(PINB & (1u << PB0)))
+		if(oneSecFlag == 1)
+		{
+			UART_sendByte(speed);
+			oneSecFlag = 0;
+		}
+
+		if(!(switch_status(PORTC, PC4)))
 		{
 			_delay_ms(30);
-			if(!(PINB & (1u << PB0)))
+			if(!(switch_status(PORTC, PC4)))
 			{
 				if(flagInc == 0)
 				{
@@ -57,10 +65,10 @@ int main(void)
 		{
 			flagInc = 0;
 		}
-		if(!(PINB & (1u << PB1)))
+		if(!(switch_status(PORTB, PB2)))
 		{
 			_delay_ms(30);
-			if(!(PINB & (1u << PB1)))
+			if(!(switch_status(PORTB, PB2)))
 			{
 				if(flagDec == 0)
 				{
@@ -77,22 +85,25 @@ int main(void)
 			flagDec = 0;
 		}
 
-		LCD_goToRowColumn(0, 5);
-		LCD_intgerToString(hours / 10);
-		LCD_intgerToString(hours % 10);
-		LCD_goToRowColumn(0, 7);
-		LCD_displayCharacter(':');
-
-		LCD_goToRowColumn(0, 8);
-		LCD_intgerToString(minutes / 10);
-		LCD_intgerToString(minutes % 10);
-		LCD_goToRowColumn(0, 10);
-		LCD_displayCharacter(':');
-
-		LCD_goToRowColumn(0, 11);
-		LCD_intgerToString(seconds / 10);
-		LCD_intgerToString(seconds % 10);
-
+		displayTime();
 	}
 }
 
+void displayTime()
+{
+	LCD_goToRowColumn(0, 5);
+	LCD_intgerToString(hours / 10);
+	LCD_intgerToString(hours % 10);
+	LCD_goToRowColumn(0, 7);
+	LCD_displayCharacter(':');
+
+	LCD_goToRowColumn(0, 8);
+	LCD_intgerToString(minutes / 10);
+	LCD_intgerToString(minutes % 10);
+	LCD_goToRowColumn(0, 10);
+	LCD_displayCharacter(':');
+
+	LCD_goToRowColumn(0, 11);
+	LCD_intgerToString(seconds / 10);
+	LCD_intgerToString(seconds % 10);
+}
