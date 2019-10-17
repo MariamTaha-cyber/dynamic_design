@@ -1,1 +1,1 @@
-# dynamic_design
+# UART Application
