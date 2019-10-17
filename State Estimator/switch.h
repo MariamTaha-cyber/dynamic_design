@@ -12,10 +12,10 @@
 #include "std_types.h"
 #include "common_macros.h"
 
-#define PORTA 0
-#define PORTB 1
-#define PORTC 2
-#define PORTD 3
+#define PORT_A 0
+#define PORT_B 1
+#define PORT_C 2
+#define PORT_D 3
 
 void switch_init(uint8 Port,uint8 Pin);
 uint8 switch_status(uint8 Port,uint8 Pin);
