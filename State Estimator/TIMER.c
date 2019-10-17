@@ -6,6 +6,7 @@
  */
 #include "TIMER.h"
 
+volatile uint8 oneSecFlag = 0;
 volatile uint8 seconds = 0;
 volatile uint8 minutes = 0;
 volatile uint8 hours = 0;
@@ -305,7 +306,10 @@ Func_status TIMER_stop(uint8 timer)
 
 ISR(TIMER1_COMPA_vect)
 {
-	PORTB |= (1u << PB0);
+	if(oneSecFlag == 0)
+	{
+		oneSecFlag = 1;
+	}
 	if (seconds < 60)
 	{
 		seconds++;

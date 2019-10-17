@@ -17,6 +17,7 @@
 extern volatile uint8 seconds;
 extern volatile uint8 minutes;
 extern volatile uint8 hours;
+extern volatile uint8 oneSecFlag;
 
 typedef enum {NOK, OK} Func_status;
 
