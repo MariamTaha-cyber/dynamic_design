@@ -5,9 +5,7 @@
  *      Author: Mariam Taha
  */
 
-#include "lcd.h"
-#include "uart.h"
-#include "TIMER.h"
+#include "Measurement_ECU.h"
 
 TIMER_cnfg_t Timer_confg={TIMER1,OUTCOMP,INTERRUPT_ON,Prescaler_1024,IN_CLK,NA,0X00,1000,CHANNEL_A,NA,NA,NA,NA,INITIALISED};
 
@@ -19,18 +17,13 @@ int main(void)
 	uint8 speed=0;
 	uint8 start_flag=0;
 
-	UART_init();
-	LCD_init();
+	Measurement_ECU_init();
 
-	switch_init(PORTB,PB2);
-	switch_init(PORTC,PC4);
+	switch_init(PORTC,0);
+	switch_init(PORTC,1);
 
-	DDRB |= (1u << PB4);
-	PORTB &= ~(1u << PB4);
-	LCD_clearScreen();
-	LCD_displayString("Distance= ");
-	LCD_goToRowColumn(0,15);
-	LCD_displayCharacter('m');
+	screen_init();
+
 
 	while(UART_recieveByte()!=start);
 	TIMER_init(&Timer_confg);
@@ -39,22 +32,21 @@ int main(void)
 	{
 		speed = UART_recieveByte();
 
-		if(!(switch_status(PORTC, PC4)))
+		if(!switch_status(PORTC,0))
 		{
 			_delay_ms(30);
-			if(!(switch_status(PORTC, PC4)))
+			if(!switch_status(PORTC,0))
 			{
 				start_flag=1;
 			}
 		}
 
 
-		if(!(switch_status(PORTB, PB2)))
+		if(!switch_status(PORTC,1))
 		{
 			_delay_ms(30);
-			if(!(switch_status(PORTB, PB2)))
+			if(!switch_status(PORTC,1))
 			{
-				distance = 0;
 				start_flag=0;
 			}
 		}
@@ -62,9 +54,8 @@ int main(void)
 
 		if(start_flag==1)
 		{
-			distance += (speed);
-			LCD_goToRowColumn(0,9);
-			LCD_intgerToString(distance);
+			distance = calculations(speed);
+			display_distance(distance);
 		}
 
 	}
