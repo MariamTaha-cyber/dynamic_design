@@ -19,8 +19,8 @@ int main(void)
 
 	Measurement_ECU_init();
 
-	switch_init(PORTC,0);
-	switch_init(PORTC,1);
+	switch_init(PORTC,4);
+	switch_init(PORTB,2);
 
 	screen_init();
 
@@ -32,21 +32,22 @@ int main(void)
 	{
 		speed = UART_recieveByte();
 
-		if(!switch_status(PORTC,0))
+		if(!switch_status(PORTC,4))
 		{
 			_delay_ms(30);
-			if(!switch_status(PORTC,0))
+			if(!switch_status(PORTC,4))
 			{
 				start_flag=1;
 			}
 		}
 
 
-		if(!switch_status(PORTC,1))
+		if(!switch_status(PORTB,2))
 		{
 			_delay_ms(30);
-			if(!switch_status(PORTC,1))
+			if(!switch_status(PORTB,2))
 			{
+				distance = 0;
 				start_flag=0;
 			}
 		}
