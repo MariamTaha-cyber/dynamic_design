@@ -15,7 +15,7 @@ void Measurement_ECU_init(void)
 uint64 calculations(uint8 Speed)
 {
 	uint64 Distance;
-	Distance = (Speed*g_tick);
+	Distance += (Speed);
 	return Distance;
 }
 
